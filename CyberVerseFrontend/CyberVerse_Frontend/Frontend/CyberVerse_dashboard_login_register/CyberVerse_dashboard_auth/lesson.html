@@ -4,165 +4,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CyberVerse - Lesson</title>
-    <link rel="stylesheet" href="CSS/style.css">
-    <link rel="stylesheet" href="CSS/pages.css">
-    <style>
-        .lesson-container {
-            max-width: 1100px;
-            margin: 50px auto;
-            padding: 24px;
-            color: #fff;
-        }
-        .lesson-header, .topic-card {
-            background: #101a18;
-            border: 1px solid #39ff8e55;
-            border-radius: 14px;
-            padding: 24px;
-            margin-bottom: 20px;
-        }
-        .topic-card h2 { color: #39ff8e; }
-        .topic-content { line-height: 1.8; }
-        .topic-content img { max-width: 100%; }
-        .lesson-status { color: #39ff8e; margin: 20px 0; }
-        .topic-nav {
-            display: flex;
-            justify-content: space-between;
-            gap: 12px;
-            margin-top: 20px;
-        }
-        .topic-nav button {
-            padding: 12px 20px;
-            cursor: pointer;
-        }
-    </style>
+    <meta name="description" content="CyberVerse cybersecurity learning lessons">
+    <title>CyberVerse | Lesson</title>
+
+    <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
-    <main class="lesson-container">
-        <a href="roadsmap.html">← Back to Roadmap</a>
 
-        <header class="lesson-header">
-            <p>CYBERVERSE LEARNING</p>
-            <h1 id="lessonTitle">Loading lesson...</h1>
-            <p id="lessonDescription"></p>
-        </header>
+<header class="topbar">
+    <a class="brand" href="index.html">
+        <span class="brand-mark">C</span>
+        CyberVerse
+    </a>
 
-        <p id="lessonStatus" class="lesson-status">Loading topics...</p>
+    <nav class="dashboard-nav">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="roadmap.html">Roadmap</a>
+    </nav>
+</header>
 
-        <section id="topicsContainer"></section>
+<main class="wrap dashboard">
 
-        <div class="topic-nav">
-            <button id="previousBtn" disabled>← Previous</button>
-            <button id="nextBtn" disabled>Next →</button>
+    <a class="back-link" href="roadmap.html">
+        ← Back to Learning Roadmap
+    </a>
+
+    <section class="dash-hero">
+        <div class="dash-copy">
+            <div class="eyebrow">
+                <span class="pulse"></span>
+                CYBERVERSE LEARNING ENVIRONMENT
+            </div>
+
+            <h1>
+                Your Learning<br>
+                <span class="cv-accent">Mission.</span>
+            </h1>
+
+            <p>
+                Understand cybersecurity concepts, explore important
+                topics and build your knowledge step by step.
+            </p>
         </div>
-    </main>
 
-    <script>
-        const API_BASE = "https://cyber-security-simulator-backend1.onrender.com/api";
+        <div class="hero-foot">
+            <span>
+                <b class="live-dot"></b>
+                LESSON ENVIRONMENT READY
+            </span>
+            <span>LEARN · EXPLORE · DEFEND</span>
+        </div>
+    </section>
 
-        const params = new URLSearchParams(window.location.search);
-        const lessonId = params.get("id");
+    <section class="dashboard-section">
 
-        const titleElement = document.getElementById("lessonTitle");
-        const descriptionElement = document.getElementById("lessonDescription");
-        const statusElement = document.getElementById("lessonStatus");
-        const container = document.getElementById("topicsContainer");
-        const previousBtn = document.getElementById("previousBtn");
-        const nextBtn = document.getElementById("nextBtn");
+        <div class="section-heading">
+            <div>
+                <div class="eyebrow">YOUR COURSE MODULE</div>
 
-        let topics = [];
-        let currentIndex = 0;
+                <h2 id="lessonTitle">Loading lesson...</h2>
 
-        async function loadLesson() {
-            if (!lessonId || !/^\d+$/.test(lessonId) || Number(lessonId) < 1) {
-                statusElement.textContent = "Invalid lesson ID.";
-                titleElement.textContent = "Lesson not found";
-                return;
-            }
+                <p id="lessonDescription" class="muted">
+                    Preparing your learning content...
+                </p>
+            </div>
+        </div>
 
-            try {
-                const response = await fetch(`${API_BASE}/lessons`);
-                if (!response.ok) throw new Error("Could not load lessons.");
+        <div class="roadmap-list" id="topicsList">
+            <p class="muted">Loading lesson topics...</p>
+        </div>
 
-                const data = await response.json();
-                if (!data.success) throw new Error(data.message || "Lesson request failed.");
+    </section>
 
-                const lesson = data.lessons.find(item => Number(item.id) === Number(lessonId));
+    <section class="dashboard-section" id="topicContent">
 
-                if (!lesson) throw new Error("Lesson not found.");
+        <div class="section-heading">
+            <div>
+                <div class="eyebrow">LEARNING MATERIAL</div>
 
-                titleElement.textContent = lesson.title;
-                descriptionElement.textContent = lesson.description || "";
+                <h2 id="topicTitle">
+                    Select a topic to begin
+                </h2>
 
-                await loadTopics();
-            } catch (error) {
-                console.error(error);
-                titleElement.textContent = "Unable to load lesson";
-                statusElement.textContent = error.message;
-            }
-        }
+                <p class="muted">
+                    Explore the topic content below.
+                </p>
+            </div>
+        </div>
 
-        async function loadTopics() {
-            const response = await fetch(`${API_BASE}/lessons/${lessonId}/topics`);
-            if (!response.ok) throw new Error("Could not load lesson topics.");
+        <article class="module-card">
+            <div id="topicText" class="topic-content">
+                <p class="muted">
+                    Choose a topic from the lesson list above.
+                </p>
+            </div>
+        </article>
 
-            const data = await response.json();
-            if (!data.success) throw new Error(data.message || "Topics request failed.");
+    </section>
 
-            topics = Array.isArray(data.topics) ? data.topics : [];
+</main>
 
-            if (topics.length === 0) {
-                statusElement.textContent = "No topics are available for this lesson.";
-                return;
-            }
+<footer class="footer">
+    <a href="dashboard.html">← Dashboard</a>
+    <span>CyberVerse · Understand. Experiment. Defend.</span>
+    <a href="roadmap.html">Learning Roadmap</a>
+</footer>
 
-            currentIndex = 0;
-            showTopic();
-        }
+<script src="js/lesson.js"></script>
 
-        function showTopic() {
-            const topic = topics[currentIndex];
-
-            container.innerHTML = "";
-
-            const article = document.createElement("article");
-            article.className = "topic-card";
-
-            const heading = document.createElement("h2");
-            heading.textContent = topic.title || "Untitled topic";
-
-            const content = document.createElement("div");
-            content.className = "topic-content";
-
-            // Topic content is authored HTML stored in your curriculum database.
-            content.innerHTML = topic.content || "<p>Content is not available yet.</p>";
-
-            article.appendChild(heading);
-            article.appendChild(content);
-            container.appendChild(article);
-
-            statusElement.textContent =
-                `Topic ${currentIndex + 1} of ${topics.length}`;
-
-            previousBtn.disabled = currentIndex === 0;
-            nextBtn.disabled = currentIndex === topics.length - 1;
-        }
-
-        previousBtn.addEventListener("click", () => {
-            if (currentIndex > 0) {
-                currentIndex--;
-                showTopic();
-            }
-        });
-
-        nextBtn.addEventListener("click", () => {
-            if (currentIndex < topics.length - 1) {
-                currentIndex++;
-                showTopic();
-            }
-        });
-
-        loadLesson();
-    </script>
 </body>
 </html>
