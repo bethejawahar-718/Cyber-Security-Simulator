@@ -1,16 +1,26 @@
 
-const API_BASE = "https://cyber-security-simulator-backend1.onrender.com/api/lessons";
+// ==========================================
+// CYBERVERSE - LESSON APPLICATION
+// ==========================================
+
+const API_BASE =
+    "https://cyber-security-simulator-backend1.onrender.com/api/lessons";
 
 const params = new URLSearchParams(window.location.search);
 const lessonId = params.get("id");
 
+// HTML ELEMENTS
 const lessonTitle = document.getElementById("lessonTitle");
 const lessonDescription = document.getElementById("lessonDescription");
 const topicsList = document.getElementById("topicsList");
-const topicTitle = document.getElementById("topicTitle");
-const topicText = document.getElementById("topicText");
+
+
+// ==========================================
+// LOAD LESSON
+// ==========================================
 
 async function loadLesson() {
+
     if (!lessonId || !/^[1-9]\d*$/.test(lessonId)) {
         lessonTitle.textContent = "Invalid lesson";
         topicsList.textContent = "Please return to the roadmap.";
@@ -36,85 +46,88 @@ async function loadLesson() {
         }
 
         lessonTitle.textContent = lesson.title;
-        lessonDescription.textContent = lesson.description || "";
+
+        lessonDescription.textContent =
+            lesson.description || "";
+
+        document.title = `${lesson.title} | CyberVerse`;
 
         await loadTopics();
 
     } catch (error) {
-        console.error(error);
+
+        console.error("Lesson loading error:", error);
+
         lessonTitle.textContent = "Unable to load lesson";
-        topicsList.textContent = "Please check your backend server.";
+
+        topicsList.textContent =
+            "Please check your backend server and try again.";
     }
 }
 
+
+// ==========================================
+// LOAD LESSON TOPICS
+// ==========================================
+
 async function loadTopics() {
+
     try {
-        const response = await fetch(`${API_BASE}/${lessonId}/topics`);
+
+        const response = await fetch(
+            `${API_BASE}/${encodeURIComponent(lessonId)}/topics`
+        );
+
         const data = await response.json();
 
         if (!response.ok || !data.success) {
             throw new Error("Unable to load topics");
         }
 
-        if (!data.topics.length) {
+        if (!Array.isArray(data.topics) || data.topics.length === 0) {
             topicsList.textContent = "No topics available.";
             return;
         }
 
         topicsList.innerHTML = data.topics.map((topic, index) => `
+
             <article class="roadmap-item">
+
                 <div class="roadmap-number">
                     ${String(index + 1).padStart(2, "0")}
                 </div>
+
                 <div>
                     <h3>${escapeHTML(topic.title)}</h3>
                 </div>
-                <button class="card-link"
-                    data-topic-id="${topic.id}">
-                    Read →
-                </button>
+
+                <a
+                    class="card-link"
+                    href="topic.html?lessonId=${encodeURIComponent(lessonId)}&id=${encodeURIComponent(topic.id)}"
+                >
+                    Read &rarr;
+                </a>
+
             </article>
+
         `).join("");
 
-        topicsList.querySelectorAll("[data-topic-id]").forEach(button => {
-            button.addEventListener("click", () => {
-                loadTopic(button.dataset.topicId);
-            });
-        });
-
     } catch (error) {
-        console.error(error);
-        topicsList.textContent = "Unable to load topics.";
+
+        console.error("Topic loading error:", error);
+
+        topicsList.textContent =
+            "Unable to load topics. Please try again.";
     }
 }
 
-async function loadTopic(topicId) {
-    try {
-        const response = await fetch(
-            `${API_BASE}/topics/${encodeURIComponent(topicId)}`
-        );
 
-        const data = await response.json();
-
-        if (!response.ok || !data.success) {
-            throw new Error("Unable to load topic");
-        }
-
-        topicTitle.textContent = data.topic.title;
-        topicText.innerHTML = sanitizeLessonHTML(data.topic.content || "<p>No content available.</p>");
-
-        document.getElementById("topicContent").scrollIntoView({
-            behavior: "smooth"
-        });
-
-    } catch (error) {
-        console.error(error);
-        topicTitle.textContent = "Unable to load topic";
-        topicText.textContent = "Please try again.";
-    }
-}
+// ==========================================
+// ESCAPE HTML
+// ==========================================
 
 function escapeHTML(value) {
+
     return String(value).replace(/[&<>"']/g, char => ({
         "&": "&amp;",
         "<": "&lt;",
@@ -122,30 +135,85 @@ function escapeHTML(value) {
         '"': "&quot;",
         "'": "&#39;"
     })[char]);
+
 }
 
-loadLesson();
 
+// ==========================================
+// SANITIZE LESSON HTML
+// ==========================================
 
-// Render lesson markup from the trusted CyberVerse lesson database using a small allow-list.
 function sanitizeLessonHTML(html) {
+
     const parser = new DOMParser();
-    const doc = parser.parseFromString(String(html), "text/html");
-    const allowed = new Set(["H2", "H3", "H4", "P", "UL", "OL", "LI", "B", "STRONG", "I", "EM", "BR", "HR", "TABLE", "THEAD", "TBODY", "TR", "TH", "TD", "CODE", "PRE", "BLOCKQUOTE"]);
+
+    const doc = parser.parseFromString(
+        String(html),
+        "text/html"
+    );
+
+    const allowed = new Set([
+        "H2", "H3", "H4",
+        "P",
+        "UL", "OL", "LI",
+        "B", "STRONG",
+        "I", "EM",
+        "BR", "HR",
+        "TABLE", "THEAD", "TBODY",
+        "TR", "TH", "TD",
+        "CODE", "PRE",
+        "BLOCKQUOTE",
+        "DIV", "SECTION", "SPAN"
+    ]);
+
+    const blocked = new Set([
+        "SCRIPT", "STYLE",
+        "IFRAME", "OBJECT", "EMBED",
+        "SVG", "FORM", "INPUT",
+        "BUTTON"
+    ]);
+
     const cleanNode = node => {
+
         [...node.childNodes].forEach(child => {
+
             if (child.nodeType === Node.ELEMENT_NODE) {
+
+                if (blocked.has(child.tagName)) {
+                    child.remove();
+                    return;
+                }
+
                 if (!allowed.has(child.tagName)) {
                     child.replaceWith(...child.childNodes);
-                } else {
-                    [...child.attributes].forEach(attr => child.removeAttribute(attr.name));
-                    cleanNode(child);
+                    return;
                 }
+
+                [...child.attributes].forEach(attr => {
+                    child.removeAttribute(attr.name);
+                });
+
+                cleanNode(child);
+
             } else if (child.nodeType !== Node.TEXT_NODE) {
+
                 child.remove();
+
             }
+
         });
+
     };
+
     cleanNode(doc.body);
+
     return doc.body.innerHTML;
+
 }
+
+
+// ==========================================
+// INITIALIZE
+// ==========================================
+
+loadLesson();
