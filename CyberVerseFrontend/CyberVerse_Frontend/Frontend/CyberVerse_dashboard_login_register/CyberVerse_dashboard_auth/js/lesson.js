@@ -1,5 +1,5 @@
 
-const API_BASE = "http://localhost:5000/api/lessons";
+const API_BASE = "https://cyber-security-simulator-backend1.onrender.com/api/lessons";
 
 const params = new URLSearchParams(window.location.search);
 const lessonId = params.get("id");

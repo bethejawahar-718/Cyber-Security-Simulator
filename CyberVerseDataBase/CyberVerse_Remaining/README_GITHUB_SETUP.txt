@@ -23,12 +23,12 @@ Frontend:
   Run index.html/login.html using VS Code Live Server.
 
 API CHECKS
-  http://localhost:5000/
-  http://localhost:5000/api/health
-  http://localhost:5000/api/user/test
+  https://cyber-security-simulator-backend1.onrender.com/
+  https://cyber-security-simulator-backend1.onrender.com/api/health
+  https://cyber-security-simulator-backend1.onrender.com/api/user/test
 
 NOTES
-- Frontend currently expects the API at http://localhost:5000/api. If deploying online, change the API base URL in the frontend JavaScript files to your deployed backend URL and configure CORS for your frontend domain.
+- Frontend currently expects the API at https://cyber-security-simulator-backend1.onrender.com/api. If deploying online, change the API base URL in the frontend JavaScript files to your deployed backend URL and configure CORS for your frontend domain.
 - Login requires a valid existing users row and matching bcrypt password hash in the CyberVerse database.
 - Existing lesson content is read from the lessons/topics tables. The lesson page now renders the HTML lesson content through an allow-list sanitizer. The 95-topic replacement migration is a separate migration from this profile bundle; use the already supplied CyberVerse_95_Topics_Replace_Migration.sql only if you still need to apply that lesson content update.
 - Browser Print -> Save as PDF is used for the resume builder. Uploaded resumes support PDF, DOC and DOCX.

@@ -1,5 +1,5 @@
 
-const API_BASE = "http://localhost:5000/api";
+const API_BASE = "https://cyber-security-simulator-backend1.onrender.com/api";
 
 // LOGIN
 const loginForm = document.getElementById("loginForm");
